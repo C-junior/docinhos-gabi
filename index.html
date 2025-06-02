@@ -1,0 +1,1538 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Docinhos da Gabi - Gestão de Doces</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'rosa-claro': '#FFF0F5',
+                        'rosa-medio': '#FFB6C1',
+                        'rosa-escuro': '#DB7093',
+                        'rosa-texto': '#C71585',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #FFF0F5;
+        }
+        
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(219, 112, 147, 0.1), 0 2px 4px -1px rgba(219, 112, 147, 0.06);
+        }
+        
+        .btn-primary {
+            background-color: #DB7093;
+            color: white;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            background-color: #C71585;
+            transform: translateY(-2px);
+        }
+        
+        .sidebar {
+            background: linear-gradient(180deg, #DB7093 0%, #C71585 100%);
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(219, 112, 147, 0.3);
+        }
+        
+        .loading-spinner {
+            border-top-color: #DB7093;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-rosa-claro">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div class="sidebar w-64 flex-shrink-0 text-white hidden md:block">
+            <div class="p-4 flex items-center justify-center">
+                <div class="bg-white rounded-full p-2 mr-3">
+                    <i class="fas fa-cake text-rosa-escuro text-2xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold">Docinhos da Gabi</h1>
+            </div>
+            <nav class="mt-8">
+                <a href="#" id="dashboard-tab" class="flex items-center px-6 py-3 text-white bg-rosa-escuro">
+                    <i class="fas fa-home mr-3"></i>
+                    Dashboard
+                </a>
+                <a href="#" id="products-tab" class="flex items-center px-6 py-3 text-white hover:bg-rosa-escuro">
+                    <i class="fas fa-box-open mr-3"></i>
+                    Produtos
+                </a>
+                <a href="#" id="sales-tab" class="flex items-center px-6 py-3 text-white hover:bg-rosa-escuro">
+                    <i class="fas fa-cash-register mr-3"></i>
+                    Vendas
+                </a>
+                <a href="#" id="reports-tab" class="flex items-center px-6 py-3 text-white hover:bg-rosa-escuro">
+                    <i class="fas fa-chart-pie mr-3"></i>
+                    Relatórios
+                </a>
+            </nav>
+            <div class="absolute bottom-0 w-64 p-4">
+                <div class="bg-white bg-opacity-20 rounded-lg p-3 text-center">
+                    <p class="text-sm">Feito por C. Junior</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile sidebar -->
+        <div class="md:hidden fixed bottom-0 w-full bg-rosa-escuro text-white z-10">
+            <div class="flex justify-around">
+                <a href="#" id="mobile-dashboard" class="p-4 text-center">
+                    <i class="fas fa-home block text-xl"></i>
+                    <span class="text-xs">Dashboard</span>
+                </a>
+                <a href="#" id="mobile-products" class="p-4 text-center">
+                    <i class="fas fa-box-open block text-xl"></i>
+                    <span class="text-xs">Produtos</span>
+                </a>
+                <a href="#" id="mobile-sales" class="p-4 text-center">
+                    <i class="fas fa-cash-register block text-xl"></i>
+                    <span class="text-xs">Vendas</span>
+                </a>
+                <a href="#" id="mobile-reports" class="p-4 text-center">
+                    <i class="fas fa-chart-pie block text-xl"></i>
+                    <span class="text-xs">Relatórios</span>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Main content -->
+        <div class="flex-1 overflow-auto pb-16 md:pb-0">
+            <!-- Header -->
+            <header class="bg-white shadow-sm p-4 flex justify-between items-center">
+                <div class="flex items-center">
+                    <button id="sidebar-toggle" class="md:hidden mr-4 text-rosa-escuro">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <h2 id="page-title" class="text-xl font-semibold text-rosa-texto">Dashboard</h2>
+                </div>
+
+            </header>
+            
+            <!-- Content -->
+            <main class="p-4">
+                <!-- Dashboard Tab -->
+                <div id="dashboard-content" class="tab-content">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                        <div class="bg-white rounded-lg p-4 card-shadow">
+                            <div class="flex justify-between">
+                                <div>
+                                    <p class="text-gray-500">Total de Vendas</p>
+                                    <h3 class="text-2xl font-bold text-rosa-texto" id="total-sales">R$ 0,00</h3>
+                                </div>
+                                <div class="w-12 h-12 rounded-full bg-rosa-claro flex items-center justify-center">
+                                    <i class="fas fa-coins text-rosa-escuro"></i>
+                                </div>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-2">Hoje</p>
+                        </div>
+                        
+                        <div class="bg-white rounded-lg p-4 card-shadow">
+                            <div class="flex justify-between">
+                                <div>
+                                    <p class="text-gray-500">Produtos Cadastrados</p>
+                                    <h3 class="text-2xl font-bold text-rosa-texto" id="total-products">0</h3>
+                                </div>
+                                <div class="w-12 h-12 rounded-full bg-rosa-claro flex items-center justify-center">
+                                    <i class="fas fa-box-open text-rosa-escuro"></i>
+                                </div>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-2">Todos os produtos</p>
+                        </div>
+                        
+                        <div class="bg-white rounded-lg p-4 card-shadow">
+                            <div class="flex justify-between">
+                                <div>
+                                    <p class="text-gray-500">Vendas do Mês</p>
+                                    <h3 class="text-2xl font-bold text-rosa-texto" id="monthly-sales">R$ 0,00</h3>
+                                </div>
+                                <div class="w-12 h-12 rounded-full bg-rosa-claro flex items-center justify-center">
+                                    <i class="fas fa-calendar-alt text-rosa-escuro"></i>
+                                </div>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-2">Este mês</p>
+                        </div>
+                        
+                        <div class="bg-white rounded-lg p-4 card-shadow">
+                            <div class="flex justify-between">
+                                <div>
+                                    <p class="text-gray-500">Produto Mais Vendido</p>
+                                    <h3 class="text-xl font-bold text-rosa-texto truncate" id="top-product">Nenhum</h3>
+                                </div>
+                                <div class="w-12 h-12 rounded-full bg-rosa-claro flex items-center justify-center">
+                                    <i class="fas fa-star text-rosa-escuro"></i>
+                                </div>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-2">Em destaque</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                        <div class="bg-white rounded-lg p-4 card-shadow">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="font-semibold text-rosa-texto">Vendas Recentes</h3>
+                                <button class="text-rosa-escuro text-sm">Ver todas</button>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full">
+                                    <thead>
+                                        <tr class="text-left text-gray-500 border-b">
+                                            <th class="pb-2">Data</th>
+                                            <th class="pb-2">Produto</th>
+                                            <th class="pb-2">Valor</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recent-sales">
+                                        <tr>
+                                            <td colspan="3" class="py-4 text-center text-gray-500">Nenhuma venda registrada</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-lg p-4 card-shadow">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="font-semibold text-rosa-texto">Estoque Baixo</h3>
+                                <button class="text-rosa-escuro text-sm">Ver todos</button>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full">
+                                    <thead>
+                                        <tr class="text-left text-gray-500 border-b">
+                                            <th class="pb-2">Produto</th>
+                                            <th class="pb-2">Estoque</th>
+                                            <th class="pb-2">Ação</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="low-stock">
+                                        <tr>
+                                            <td colspan="3" class="py-4 text-center text-gray-500">Nenhum produto com estoque baixo</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg p-4 card-shadow mb-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-semibold text-rosa-texto">Vendas Mensais</h3>
+                            <select id="sales-year" class="border rounded px-2 py-1 text-sm">
+                                <option value="2023">2023</option>
+                                <option value="2024" selected>2024</option>
+                            </select>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="sales-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Products Tab -->
+                <div id="products-content" class="tab-content hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-semibold text-rosa-texto">Produtos</h2>
+                        <button id="add-product-btn" class="btn-primary px-4 py-2 rounded-lg flex items-center">
+                            <i class="fas fa-plus mr-2"></i> Adicionar Produto
+                        </button>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg p-4 card-shadow mb-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-semibold text-rosa-texto">Lista de Produtos</h3>
+                            <div class="relative">
+                                <input type="text" id="product-search" placeholder="Buscar produto..." class="border rounded pl-8 pr-4 py-1 text-sm">
+                                <i class="fas fa-search absolute left-2 top-2 text-gray-400"></i>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full">
+                                <thead>
+                                    <tr class="text-left text-gray-500 border-b">
+                                        <th class="pb-2">Nome</th>
+                                        <th class="pb-2">Preço</th>
+                                        <th class="pb-2">Estoque</th>
+                                        <th class="pb-2">Categoria</th>
+                                        <th class="pb-2">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="products-list">
+                                    <tr>
+                                        <td colspan="5" class="py-4 text-center text-gray-500">Nenhum produto cadastrado</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Add/Edit Product Modal -->
+                <div id="product-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-20 hidden">
+                    <div class="bg-white rounded-lg w-full max-w-md mx-4">
+                        <div class="p-4 border-b flex justify-between items-center">
+                            <h3 class="text-lg font-semibold text-rosa-texto" id="modal-title">Adicionar Produto</h3>
+                            <button id="close-modal" class="text-gray-500 hover:text-gray-700">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="p-4">
+                            <form id="product-form">
+                                <input type="hidden" id="product-id">
+                                <div class="mb-4">
+                                    <label for="product-name" class="block text-gray-700 mb-2">Nome do Produto</label>
+                                    <input type="text" id="product-name" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-rosa-medio" required>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="product-price" class="block text-gray-700 mb-2">Preço (R$)</label>
+                                    <input type="number" id="product-price" step="0.01" min="0" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-rosa-medio" required>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="product-stock" class="block text-gray-700 mb-2">Quantidade em Estoque</label>
+                                    <input type="number" id="product-stock" min="0" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-rosa-medio" required>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="product-category" class="block text-gray-700 mb-2">Categoria</label>
+                                    <select id="product-category" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-rosa-medio">
+
+                                        <option value="Bolo">Bolo</option>
+                                        <option value="Outros">Outros</option>
+                                    </select>
+                                </div>
+
+                            </form>
+                        </div>
+                        <div class="p-4 border-t flex justify-end">
+                            <button type="button" id="cancel-product" class="px-4 py-2 border rounded mr-2 text-gray-700 hover:bg-gray-100">Cancelar</button>
+                            <button type="button" id="save-product" class="btn-primary px-4 py-2 rounded">Salvar</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Sales Tab -->
+                <div id="sales-content" class="tab-content hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-semibold text-rosa-texto">Registro de Vendas</h2>
+                        <button id="new-sale-btn" class="btn-primary px-4 py-2 rounded-lg flex items-center">
+                            <i class="fas fa-plus mr-2"></i> Nova Venda
+                        </button>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg p-4 card-shadow mb-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-semibold text-rosa-texto">Histórico de Vendas</h3>
+                            <div class="flex">
+                                <input type="date" id="sales-date-filter" class="border rounded px-3 py-1 mr-2 text-sm">
+                                <button id="filter-sales" class="btn-primary px-3 py-1 rounded text-sm">Filtrar</button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full">
+                                <thead>
+                                    <tr class="text-left text-gray-500 border-b">
+                                        <th class="pb-2">Data</th>
+                                        <th class="pb-2">Produto</th>
+                                        <th class="pb-2">Quantidade</th>
+                                        <th class="pb-2">Valor Unitário</th>
+                                        <th class="pb-2">Total</th>
+                                        <th class="pb-2">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="sales-list">
+                                    <tr>
+                                        <td colspan="6" class="py-4 text-center text-gray-500">Nenhuma venda registrada</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- New Sale Modal -->
+                <div id="sale-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-20 hidden">
+                    <div class="bg-white rounded-lg w-full max-w-md mx-4">
+                        <div class="p-4 border-b flex justify-between items-center">
+                            <h3 class="text-lg font-semibold text-rosa-texto">Registrar Nova Venda</h3>
+                            <button id="close-sale-modal" class="text-gray-500 hover:text-gray-700">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="p-4">
+                            <form id="sale-form">
+                                <div class="mb-4">
+                                    <label for="sale-date" class="block text-gray-700 mb-2">Data</label>
+                                    <input type="date" id="sale-date" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-rosa-medio" required>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="sale-product" class="block text-gray-700 mb-2">Produto</label>
+                                    <select id="sale-product" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-rosa-medio" required>
+                                        <option value="">Selecione um produto</option>
+                                    </select>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="sale-quantity" class="block text-gray-700 mb-2">Quantidade</label>
+                                    <input type="number" id="sale-quantity" min="1" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-rosa-medio" required>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="sale-price" class="block text-gray-700 mb-2">Preço Unitário (R$)</label>
+                                    <input type="number" id="sale-price" step="0.01" min="0" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-rosa-medio" required>
+                                </div>
+                                <div class="mb-4 p-3 bg-rosa-claro rounded">
+                                    <p class="text-gray-700">Total: <span id="sale-total" class="font-semibold text-rosa-texto">R$ 0,00</span></p>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="p-4 border-t flex justify-end">
+                            <button type="button" id="cancel-sale" class="px-4 py-2 border rounded mr-2 text-gray-700 hover:bg-gray-100">Cancelar</button>
+                            <button type="button" id="save-sale" class="btn-primary px-4 py-2 rounded">Registrar</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Reports Tab -->
+                <div id="reports-content" class="tab-content hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-semibold text-rosa-texto">Relatórios</h2>
+                        <div class="flex">
+                            <select id="report-type" class="border rounded px-3 py-1 mr-2 text-sm">
+                                <option value="monthly">Vendas Mensais</option>
+                                <option value="products">Produtos Mais Vendidos</option>
+                                <option value="categories">Vendas por Categoria</option>
+                            </select>
+                            <button id="generate-report" class="btn-primary px-3 py-1 rounded text-sm">Gerar Relatório</button>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg p-4 card-shadow mb-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-semibold text-rosa-texto" id="report-title">Relatório de Vendas Mensais</h3>
+                            <!-- <button id="export-report" class="text-rosa-escuro text-sm flex items-center">
+                                <i class="fas fa-file-export mr-1"></i> Exportar
+                            </button> -->
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="report-chart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg p-4 card-shadow">
+                        <h3 class="font-semibold text-rosa-texto mb-4">Dados do Relatório</h3>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full">
+                                <thead>
+                                    <tr class="text-left text-gray-500 border-b">
+                                        <th class="pb-2" id="report-col1">Mês</th>
+                                        <th class="pb-2" id="report-col2">Total de Vendas</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="report-data">
+                                    <tr>
+                                        <td colspan="2" class="py-4 text-center text-gray-500">Selecione um tipo de relatório e clique em "Gerar Relatório"</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Loading Overlay -->
+                <div id="loading-overlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-30 hidden">
+                    <div class="bg-white rounded-lg p-6 flex flex-col items-center">
+                        <div class="w-12 h-12 border-4 border-rosa-claro border-t-rosa-escuro rounded-full loading-spinner mb-4"></div>
+                        <p class="text-gray-700">Carregando...</p>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // API Configuration
+        const API_URL = 'https://api.jsonbin.io/v3/b/683bc6c78a456b7966a7f310';
+        const API_KEY = '$2b$10$P7NKZWcsg5w4bTWYN9GyEe0kQ52eE3wizCI1A1hqzaMrDAGLZq/jO';
+        
+        // Global variables
+        let products = [];
+        let sales = [];
+        let currentTab = 'dashboard';
+        let editProductId = null;
+        let editSaleId = null;
+        
+        // DOM Elements
+        const tabContents = {
+            'dashboard': document.getElementById('dashboard-content'),
+            'products': document.getElementById('products-content'),
+            'sales': document.getElementById('sales-content'),
+            'reports': document.getElementById('reports-content')
+        };
+        
+        const tabButtons = {
+            'dashboard': [document.getElementById('dashboard-tab'), document.getElementById('mobile-dashboard')],
+            'products': [document.getElementById('products-tab'), document.getElementById('mobile-products')],
+            'sales': [document.getElementById('sales-tab'), document.getElementById('mobile-sales')],
+            'reports': [document.getElementById('reports-tab'), document.getElementById('mobile-reports')]
+        };
+        
+        const pageTitle = document.getElementById('page-title');
+        const loadingOverlay = document.getElementById('loading-overlay');
+        
+        // Charts
+        let salesChart = null;
+        let reportChart = null;
+        
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Load data from API
+            await loadData();
+            
+            // Initialize charts first
+            initSalesChart();
+            
+            // Setup event listeners
+            setupEventListeners();
+            
+            // Initialize dashboard after charts
+            updateDashboard();
+            
+            // Initialize products list
+            renderProductsList();
+            
+            // Initialize sales list
+            renderSalesList();
+            
+            // Initialize charts
+            initSalesChart();
+        });
+        
+        // Load data from API
+        async function loadData() {
+            showLoading();
+            
+            try {
+                const response = await fetch(API_URL + '/latest', {
+                    headers: {
+                        'X-Master-Key': API_KEY,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.record) {
+                    products = data.record.products || [];
+                    sales = data.record.sales || [];
+                }
+            } catch (error) {
+                console.error('Error loading data:', error);
+                alert('Erro ao carregar dados. Por favor, tente novamente.');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // Save data to API
+        async function saveData() {
+            showLoading();
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'PUT',
+                    headers: {
+                        'X-Master-Key': API_KEY,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        products: products,
+                        sales: sales
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to save data');
+                }
+            } catch (error) {
+                console.error('Error saving data:', error);
+                alert('Erro ao salvar dados. Por favor, tente novamente.');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // Setup event listeners
+        function setupEventListeners() {
+            // Tab navigation
+            for (const [tabName, buttons] of Object.entries(tabButtons)) {
+                buttons.forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        switchTab(tabName);
+                    });
+                });
+            }
+            
+            // Sidebar toggle for mobile
+            document.getElementById('sidebar-toggle').addEventListener('click', () => {
+                document.querySelector('.sidebar').classList.toggle('hidden');
+            });
+            
+            // Product modal
+            document.getElementById('add-product-btn').addEventListener('click', () => {
+                openProductModal();
+            });
+            
+            document.getElementById('close-modal').addEventListener('click', () => {
+                closeProductModal();
+            });
+            
+            document.getElementById('cancel-product').addEventListener('click', () => {
+                closeProductModal();
+            });
+            
+            document.getElementById('save-product').addEventListener('click', () => {
+                saveProduct();
+            });
+            
+            // Sale modal
+            document.getElementById('new-sale-btn').addEventListener('click', () => {
+                openSaleModal();
+            });
+            
+            document.getElementById('close-sale-modal').addEventListener('click', () => {
+                closeSaleModal();
+            });
+            
+            document.getElementById('cancel-sale').addEventListener('click', () => {
+                closeSaleModal();
+            });
+            
+            document.getElementById('save-sale').addEventListener('click', () => {
+                saveSale();
+            });
+            
+            // Product search
+            document.getElementById('product-search').addEventListener('input', (e) => {
+                renderProductsList(e.target.value);
+            });
+            
+            // Sales filter
+            document.getElementById('filter-sales').addEventListener('click', () => {
+                const dateFilter = document.getElementById('sales-date-filter').value;
+                renderSalesList(dateFilter);
+            });
+            
+            // Report generation
+            document.getElementById('generate-report').addEventListener('click', () => {
+                generateReport();
+            });
+            
+            // Calculate sale total
+            document.getElementById('sale-quantity').addEventListener('input', updateSaleTotal);
+            document.getElementById('sale-price').addEventListener('input', updateSaleTotal);
+            
+            // Update product price when selected
+            document.getElementById('sale-product').addEventListener('change', (e) => {
+                const productId = e.target.value;
+                const product = products.find(p => p.id === productId);
+                
+                if (product) {
+                    document.getElementById('sale-price').value = product.price;
+                    updateSaleTotal();
+                }
+            });
+        }
+        
+        // Switch between tabs
+        function switchTab(tabName) {
+            // Hide all tab contents
+            for (const content of Object.values(tabContents)) {
+                content.classList.add('hidden');
+            }
+            
+            // Show selected tab content
+            tabContents[tabName].classList.remove('hidden');
+            
+            // Update active tab button
+            for (const [name, buttons] of Object.entries(tabButtons)) {
+                buttons.forEach(button => {
+                    if (name === tabName) {
+                        button.classList.add('bg-rosa-escuro');
+                    } else {
+                        button.classList.remove('bg-rosa-escuro');
+                    }
+                });
+            }
+            
+            // Update page title
+            currentTab = tabName;
+            pageTitle.textContent = getTabTitle(tabName);
+            
+            // Update specific tab content if needed
+            if (tabName === 'dashboard') {
+                updateDashboard();
+            } else if (tabName === 'reports') {
+                // Initialize report chart if not already initialized
+                if (!reportChart) {
+                    initReportChart();
+                }
+            }
+        }
+        
+        // Get tab title
+        function getTabTitle(tabName) {
+            const titles = {
+                'dashboard': 'Dashboard',
+                'products': 'Produtos',
+                'sales': 'Vendas',
+                'reports': 'Relatórios'
+            };
+            
+            return titles[tabName];
+        }
+        
+        // Show loading overlay
+        function showLoading() {
+            loadingOverlay.classList.remove('hidden');
+        }
+        
+        // Hide loading overlay
+        function hideLoading() {
+            loadingOverlay.classList.add('hidden');
+        }
+        
+        // Update dashboard with current data
+        function updateDashboard() {
+            // Calculate total sales
+            const totalSales = sales.reduce((sum, sale) => sum + (sale.price * sale.quantity), 0);
+            document.getElementById('total-sales').textContent = formatCurrency(totalSales);
+            
+            // Calculate monthly sales (current month)
+            const now = new Date();
+            const currentMonth = now.getMonth() + 1;
+            const currentYear = now.getFullYear();
+            
+            const monthlySales = sales
+                .filter(sale => {
+                    const saleDate = new Date(sale.date);
+                    return saleDate.getMonth() + 1 === currentMonth && saleDate.getFullYear() === currentYear;
+                })
+                .reduce((sum, sale) => sum + (sale.price * sale.quantity), 0);
+                
+            document.getElementById('monthly-sales').textContent = formatCurrency(monthlySales);
+            
+            // Update total products
+            document.getElementById('total-products').textContent = products.length;
+            
+            // Find top product
+            if (sales.length > 0) {
+                const productSales = {};
+                
+                sales.forEach(sale => {
+                    if (!productSales[sale.productId]) {
+                        productSales[sale.productId] = 0;
+                    }
+                    productSales[sale.productId] += sale.quantity;
+                });
+                
+                let topProductId = null;
+                let maxSales = 0;
+                
+                for (const [productId, quantity] of Object.entries(productSales)) {
+                    if (quantity > maxSales) {
+                        maxSales = quantity;
+                        topProductId = productId;
+                    }
+                }
+                
+                if (topProductId) {
+                    const product = products.find(p => p.id === topProductId);
+                    document.getElementById('top-product').textContent = product.name;
+                }
+            }
+            
+            // Update recent sales
+            updateRecentSales();
+            
+            // Update low stock products
+            updateLowStock();
+            
+            // Update sales chart
+            updateSalesChart();
+        }
+        
+        // Update recent sales list
+        function updateRecentSales() {
+            const recentSalesList = document.getElementById('recent-sales');
+            recentSalesList.innerHTML = '';
+            
+            if (sales.length === 0) {
+                recentSalesList.innerHTML = `
+                    <tr>
+                        <td colspan="3" class="py-4 text-center text-gray-500">Nenhuma venda registrada</td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // Sort by date (newest first)
+            const sortedSales = [...sales].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            // Show only last 5 sales
+            const recentSales = sortedSales.slice(0, 5);
+            
+            recentSales.forEach(sale => {
+                const product = products.find(p => p.id === sale.productId);
+                const productName = product ? product.name : 'Produto não encontrado';
+                
+                const row = document.createElement('tr');
+                row.className = 'border-b';
+                row.innerHTML = `
+                    <td class="py-3">${formatDate(sale.date)}</td>
+                    <td class="py-3">${productName}</td>
+                    <td class="py-3">${formatCurrency(sale.price * sale.quantity)}</td>
+                `;
+                
+                recentSalesList.appendChild(row);
+            });
+        }
+        
+        // Update low stock products
+        function updateLowStock() {
+            const lowStockList = document.getElementById('low-stock');
+            lowStockList.innerHTML = '';
+            
+            const lowStockProducts = products.filter(product => product.stock < 10);
+            
+            if (lowStockProducts.length === 0) {
+                lowStockList.innerHTML = `
+                    <tr>
+                        <td colspan="3" class="py-4 text-center text-gray-500">Nenhum produto com estoque baixo</td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            lowStockProducts.forEach(product => {
+                const row = document.createElement('tr');
+                row.className = 'border-b';
+                row.innerHTML = `
+                    <td class="py-3">${product.name}</td>
+                    <td class="py-3">${product.stock}</td>
+                    <td class="py-3">
+                        <button class="text-rosa-escuro hover:text-rosa-texto mr-2" onclick="editProduct('${product.id}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </td>
+                `;
+                
+                lowStockList.appendChild(row);
+            });
+        }
+        
+        // Initialize sales chart
+        function initSalesChart() {
+            const ctx = document.getElementById('sales-chart').getContext('2d');
+            
+            salesChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Vendas Mensais',
+                        data: [],
+                        backgroundColor: '#DB7093',
+                        borderColor: '#C71585',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return 'R$ ' + value.toLocaleString('pt-BR');
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return 'R$ ' + context.raw.toLocaleString('pt-BR');
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            updateSalesChart();
+        }
+        
+        // Update sales chart with current data
+        function updateSalesChart() {
+            const year = parseInt(document.getElementById('sales-year').value);
+            const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+            
+            const monthlySales = Array(12).fill(0);
+            
+            sales.forEach(sale => {
+                const saleDate = new Date(sale.date);
+                if (saleDate.getFullYear() === year) {
+                    const month = saleDate.getMonth();
+                    monthlySales[month] += sale.price * sale.quantity;
+                }
+            });
+            
+            salesChart.data.labels = months;
+            salesChart.data.datasets[0].data = monthlySales;
+            salesChart.update();
+        }
+        
+// Initialize sales chart
+function initSalesChart() {
+    const ctx = document.getElementById('sales-chart').getContext('2d');
+    salesChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Vendas Mensais',
+                data: [],
+                backgroundColor: 'rgba(0, 123, 255, 0.6)'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return 'R$ ' + context.raw.toLocaleString('pt-BR');
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+        // Initialize report chart
+        function initReportChart() {
+            const ctx = document.getElementById('report-chart').getContext('2d');
+            
+            reportChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: '',
+                        data: [],
+                        backgroundColor: '#DB7093',
+                        borderColor: '#C71585',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Generate report based on selected type
+        function generateReport() {
+            const reportType = document.getElementById('report-type').value;
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            
+            let labels = [];
+            let data = [];
+            let reportTitle = '';
+            let col1 = '';
+            let col2 = '';
+            
+            if (reportType === 'monthly') {
+                // Monthly sales report
+                const months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+                
+                const monthlySales = Array(12).fill(0);
+                
+                sales.forEach(sale => {
+                    const saleDate = new Date(sale.date);
+                    if (saleDate.getFullYear() === currentYear) {
+                        const month = saleDate.getMonth();
+                        monthlySales[month] += sale.price * sale.quantity;
+                    }
+                });
+                
+                labels = months;
+                data = monthlySales;
+                reportTitle = `Vendas Mensais - ${currentYear}`;
+                col1 = 'Mês';
+                col2 = 'Total de Vendas';
+                
+                reportChart.data.datasets[0].label = 'Vendas (R$)';
+                
+                // Update tooltip to show currency
+                reportChart.options.plugins = {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return 'R$ ' + context.raw.toLocaleString('pt-BR');
+                            }
+                        }
+                    }
+                };
+            } else if (reportType === 'products') {
+                // Top products report
+                const productSales = {};
+                
+                sales.forEach(sale => {
+                    if (!productSales[sale.productId]) {
+                        productSales[sale.productId] = 0;
+                    }
+                    productSales[sale.productId] += sale.quantity;
+                });
+                
+                // Sort products by sales quantity
+                const sortedProducts = Object.entries(productSales)
+                    .map(([productId, quantity]) => {
+                        const product = products.find(p => p.id === productId);
+                        return {
+                            name: product ? product.name : 'Produto não encontrado',
+                            quantity: quantity
+                        };
+                    })
+                    .sort((a, b) => b.quantity - a.quantity)
+                    .slice(0, 10);
+                
+                labels = sortedProducts.map(p => p.name);
+                data = sortedProducts.map(p => p.quantity);
+                reportTitle = 'Produtos Mais Vendidos';
+                col1 = 'Produto';
+                col2 = 'Quantidade Vendida';
+                
+                reportChart.data.datasets[0].label = 'Quantidade';
+                
+                // Reset tooltip
+                reportChart.options.plugins = {};
+            } else if (reportType === 'categories') {
+                // Sales by category report
+                const categorySales = {};
+                
+                sales.forEach(sale => {
+                    const product = products.find(p => p.id === sale.productId);
+                    if (product) {
+                        const category = product.category || 'Outros';
+                        if (!categorySales[category]) {
+                            categorySales[category] = 0;
+                        }
+                        categorySales[category] += sale.price * sale.quantity;
+                    }
+                });
+                
+                labels = Object.keys(categorySales);
+                data = Object.values(categorySales);
+                reportTitle = 'Vendas por Categoria';
+                col1 = 'Categoria';
+                col2 = 'Total de Vendas';
+                
+                reportChart.data.datasets[0].label = 'Vendas (R$)';
+                
+                // Update tooltip to show currency
+                reportChart.options.plugins = {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return 'R$ ' + context.raw.toLocaleString('pt-BR');
+                            }
+                        }
+                    }
+                };
+            }
+            
+            // Update report chart
+            reportChart.data.labels = labels;
+            reportChart.data.datasets[0].data = data;
+            reportChart.update();
+            
+            // Update report title
+            document.getElementById('report-title').textContent = reportTitle;
+            
+            // Update report table
+            const reportData = document.getElementById('report-data');
+            reportData.innerHTML = '';
+            
+            // Update column headers
+            document.getElementById('report-col1').textContent = col1;
+            document.getElementById('report-col2').textContent = col2;
+            
+            // Add data rows
+            for (let i = 0; i < labels.length; i++) {
+                const row = document.createElement('tr');
+                row.className = 'border-b';
+                
+                if (reportType === 'monthly' || reportType === 'categories') {
+                    row.innerHTML = `
+                        <td class="py-3">${labels[i]}</td>
+                        <td class="py-3">${formatCurrency(data[i])}</td>
+                    `;
+                } else {
+                    row.innerHTML = `
+                        <td class="py-3">${labels[i]}</td>
+                        <td class="py-3">${data[i]}</td>
+                    `;
+                }
+                
+                reportData.appendChild(row);
+            }
+        }
+        
+        // Render products list
+        function renderProductsList(searchTerm = '') {
+            const productsList = document.getElementById('products-list');
+            productsList.innerHTML = '';
+            
+            let filteredProducts = [...products];
+            
+            if (searchTerm) {
+                const term = searchTerm.toLowerCase();
+                filteredProducts = products.filter(product => 
+                    product.name.toLowerCase().includes(term) ||
+                    (product.category && product.category.toLowerCase().includes(term)) ||
+                    (product.description && product.description.toLowerCase().includes(term))
+                );
+            }
+            
+            if (filteredProducts.length === 0) {
+                productsList.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="py-4 text-center text-gray-500">Nenhum produto encontrado</td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            filteredProducts.forEach(product => {
+                const row = document.createElement('tr');
+                row.className = 'border-b';
+                row.innerHTML = `
+                    <td class="py-3">${product.name}</td>
+                    <td class="py-3">${formatCurrency(product.price)}</td>
+                    <td class="py-3">${product.stock}</td>
+                    <td class="py-3">${product.category || '-'}</td>
+                    <td class="py-3">
+                        <button class="text-rosa-escuro hover:text-rosa-texto mr-2" onclick="editProduct('${product.id}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="text-red-500 hover:text-red-700" onclick="deleteProduct('${product.id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                
+                productsList.appendChild(row);
+            });
+        }
+        
+        // Render sales list
+        function renderSalesList(dateFilter = '') {
+            const salesList = document.getElementById('sales-list');
+            salesList.innerHTML = '';
+            
+            let filteredSales = [...sales];
+            
+            if (dateFilter) {
+                filteredSales = sales.filter(sale => sale.date === dateFilter);
+            }
+            
+            if (filteredSales.length === 0) {
+                salesList.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="py-4 text-center text-gray-500">${dateFilter ? 'Nenhuma venda nesta data' : 'Nenhuma venda registrada'}</td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // Sort by date (newest first)
+            filteredSales.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            filteredSales.forEach(sale => {
+                const product = products.find(p => p.id === sale.productId);
+                const productName = product ? product.name : 'Produto não encontrado';
+                
+                const row = document.createElement('tr');
+                row.className = 'border-b';
+                row.innerHTML = `
+                    <td class="py-3">${formatDate(sale.date)}</td>
+                    <td class="py-3">${productName}</td>
+                    <td class="py-3">${sale.quantity}</td>
+                    <td class="py-3">${formatCurrency(sale.price)}</td>
+                    <td class="py-3">${formatCurrency(sale.price * sale.quantity)}</td>
+                    <td class="py-3">
+                        <button class="text-red-500 hover:text-red-700" onclick="deleteSale('${sale.id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                
+                salesList.appendChild(row);
+            });
+        }
+        
+        // Open product modal for adding new product
+        function openProductModal(product = null) {
+            const modal = document.getElementById('product-modal');
+            const form = document.getElementById('product-form');
+            
+            if (product) {
+                // Edit mode
+                document.getElementById('modal-title').textContent = 'Editar Produto';
+                document.getElementById('product-id').value = product.id;
+                document.getElementById('product-name').value = product.name;
+                document.getElementById('product-price').value = product.price;
+                document.getElementById('product-stock').value = product.stock;
+                document.getElementById('product-category').value = product.category || 'Outros';
+                document.getElementById('product-description').value = product.description || '';
+                
+                editProductId = product.id;
+            } else {
+                // Add mode
+                document.getElementById('modal-title').textContent = 'Adicionar Produto';
+                form.reset();
+                editProductId = null;
+            }
+            
+            modal.classList.remove('hidden');
+        }
+        
+        // Close product modal
+        function closeProductModal() {
+            document.getElementById('product-modal').classList.add('hidden');
+            document.getElementById('product-form').reset();
+            editProductId = null;
+        }
+        
+        // Save product (add or edit)
+        async function saveProduct() {
+            const form = document.getElementById('product-form');
+            const name = document.getElementById('product-name').value.trim();
+            const price = parseFloat(document.getElementById('product-price').value);
+            const stock = parseInt(document.getElementById('product-stock').value);
+            const category = document.getElementById('product-category').value;
+            const description = document.getElementById('product-description').value.trim();
+            
+            if (!name || isNaN(price) || isNaN(stock)) {
+                alert('Por favor, preencha todos os campos obrigatórios.');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                if (editProductId) {
+                    // Edit existing product
+                    const index = products.findIndex(p => p.id === editProductId);
+                    if (index !== -1) {
+                        products[index] = {
+                            ...products[index],
+                            name,
+                            price,
+                            stock,
+                            category,
+                            description
+                        };
+                    }
+                } else {
+                    // Add new product
+                    const newProduct = {
+                        id: generateId(),
+                        name,
+                        price,
+                        stock,
+                        category,
+                        description
+                    };
+                    
+                    products.push(newProduct);
+                }
+                
+                // Save to API
+                await saveData();
+                
+                // Update UI
+                renderProductsList();
+                updateDashboard();
+                closeProductModal();
+            } catch (error) {
+                console.error('Error saving product:', error);
+                alert('Erro ao salvar produto. Por favor, tente novamente.');
+            } finally {
+                // Ensure channel closure after saving
+                if (channel && !channel.closed) {
+                    channel.close();
+                }
+                hideLoading();
+            }
+        }
+        
+        // Open sale modal for adding new sale
+        function openSaleModal(sale = null) {
+            const modal = document.getElementById('sale-modal');
+            const form = document.getElementById('sale-form');
+            const productSelect = document.getElementById('sale-product');
+            
+            // Populate product dropdown
+            productSelect.innerHTML = '<option value="">Selecione um produto</option>';
+            products.forEach(product => {
+                const option = document.createElement('option');
+                option.value = product.id;
+                option.textContent = product.name;
+                productSelect.appendChild(option);
+            });
+            
+            // Set today's date as default
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('sale-date').value = today;
+            
+            if (sale) {
+                // Edit mode (if needed)
+                document.getElementById('sale-product').value = sale.productId;
+                document.getElementById('sale-quantity').value = sale.quantity;
+                document.getElementById('sale-price').value = sale.price;
+                document.getElementById('sale-date').value = sale.date;
+                
+                editSaleId = sale.id;
+            } else {
+                // Add mode
+                form.reset();
+                editSaleId = null;
+            }
+            
+            // Update total
+            updateSaleTotal();
+            
+            modal.classList.remove('hidden');
+        }
+        
+        // Close sale modal
+        function closeSaleModal() {
+            document.getElementById('sale-modal').classList.add('hidden');
+            document.getElementById('sale-form').reset();
+            editSaleId = null;
+        }
+        
+        // Update sale total calculation
+        function updateSaleTotal() {
+            const quantity = parseInt(document.getElementById('sale-quantity').value) || 0;
+            const price = parseFloat(document.getElementById('sale-price').value) || 0;
+            const total = quantity * price;
+            
+            document.getElementById('sale-total').textContent = formatCurrency(total);
+        }
+        
+        // Save sale (add or edit)
+        async function saveSale() {
+            const productId = document.getElementById('sale-product').value;
+            const quantity = parseInt(document.getElementById('sale-quantity').value);
+            const price = parseFloat(document.getElementById('sale-price').value);
+            const date = document.getElementById('sale-date').value;
+            
+            if (!productId || isNaN(quantity) || quantity <= 0 || isNaN(price) || price <= 0 || !date) {
+                alert('Por favor, preencha todos os campos corretamente.');
+                return;
+            }
+            
+            // Check if product has enough stock
+            const product = products.find(p => p.id === productId);
+            if (!product) {
+                alert('Produto não encontrado.');
+                return;
+            }
+            
+            if (product.stock < quantity) {
+                alert('Quantidade em estoque insuficiente.');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                if (editSaleId) {
+                    // Edit existing sale (if needed)
+                    const index = sales.findIndex(s => s.id === editSaleId);
+                    if (index !== -1) {
+                        sales[index] = {
+                            ...sales[index],
+                            productId,
+                            quantity,
+                            price,
+                            date
+                        };
+                    }
+                } else {
+                    // Add new sale
+                    const newSale = {
+                        id: generateId(),
+                        productId,
+                        quantity,
+                        price,
+                        date
+                    };
+                    
+                    sales.push(newSale);
+                    
+                    // Update product stock
+                    product.stock -= quantity;
+                }
+                
+                // Save to API
+                await saveData();
+                
+                // Update UI
+                renderSalesList();
+                renderProductsList();
+                updateDashboard();
+                closeSaleModal();
+            } catch (error) {
+                console.error('Error saving sale:', error);
+                alert('Erro ao registrar venda. Por favor, tente novamente.');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // Edit product
+        function editProduct(productId) {
+            const product = products.find(p => p.id === productId);
+            if (product) {
+                openProductModal(product);
+            }
+        }
+        
+        // Delete product
+        async function deleteProduct(productId) {
+            if (!confirm('Tem certeza que deseja excluir este produto?')) {
+                return;
+            }
+            
+            // Check if product has sales
+            const hasSales = sales.some(s => s.productId === productId);
+            
+            if (hasSales) {
+                alert('Este produto possui vendas associadas e não pode ser excluído.');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                products = products.filter(p => p.id !== productId);
+                await saveData();
+                
+                renderProductsList();
+                updateDashboard();
+            } catch (error) {
+                console.error('Error deleting product:', error);
+                alert('Erro ao excluir produto. Por favor, tente novamente.');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // Delete sale
+        async function deleteSale(saleId) {
+            if (!confirm('Tem certeza que deseja excluir esta venda?')) {
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                const sale = sales.find(s => s.id === saleId);
+                if (sale) {
+                    // Restore product stock
+                    const product = products.find(p => p.id === sale.productId);
+                    if (product) {
+                        product.stock += sale.quantity;
+                    }
+                    
+                    // Remove sale
+                    sales = sales.filter(s => s.id !== saleId);
+                    
+                    await saveData();
+                    
+                    renderSalesList();
+                    renderProductsList();
+                    updateDashboard();
+                }
+            } catch (error) {
+                console.error('Error deleting sale:', error);
+                alert('Erro ao excluir venda. Por favor, tente novamente.');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // Helper functions
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+        
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+        }
+        
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('pt-BR');
+        }
+        
+        // Make functions available globally for inline event handlers
+        window.editProduct = editProduct;
+        window.deleteProduct = deleteProduct;
+        window.deleteSale = deleteSale;
+    </script>
+</body>
+</html>
