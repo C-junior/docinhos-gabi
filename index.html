@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Docinhos da Gabi - Gestão de Doces</title>
+    <title>Docinhos da Gabi - Gestão Financeira</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
@@ -15,6 +15,8 @@
                         'rosa-medio': '#FFB6C1',
                         'rosa-escuro': '#DB7093',
                         'rosa-texto': '#C71585',
+                        'verde': '#10B981',
+                        'vermelho': '#EF4444'
                     }
                 }
             }
@@ -43,6 +45,17 @@
             transform: translateY(-2px);
         }
         
+        .btn-expense {
+            background-color: #EF4444;
+            color: white;
+            transition: all 0.3s;
+        }
+        
+        .btn-expense:hover {
+            background-color: #DC2626;
+            transform: translateY(-2px);
+        }
+        
         .sidebar {
             background: linear-gradient(180deg, #DB7093 0%, #C71585 100%);
         }
@@ -66,6 +79,14 @@
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+        
+        .profit {
+            color: #10B981;
+        }
+        
+        .loss {
+            color: #EF4444;
         }
     </style>
 </head>
@@ -91,6 +112,10 @@
                 <a href="#" id="sales-tab" class="flex items-center px-6 py-3 text-white hover:bg-rosa-escuro">
                     <i class="fas fa-cash-register mr-3"></i>
                     Vendas
+                </a>
+                <a href="#" id="expenses-tab" class="flex items-center px-6 py-3 text-white hover:bg-rosa-escuro">
+                    <i class="fas fa-file-invoice-dollar mr-3"></i>
+                    Despesas
                 </a>
                 <a href="#" id="reports-tab" class="flex items-center px-6 py-3 text-white hover:bg-rosa-escuro">
                     <i class="fas fa-chart-pie mr-3"></i>
@@ -119,9 +144,9 @@
                     <i class="fas fa-cash-register block text-xl"></i>
                     <span class="text-xs">Vendas</span>
                 </a>
-                <a href="#" id="mobile-reports" class="p-4 text-center">
-                    <i class="fas fa-chart-pie block text-xl"></i>
-                    <span class="text-xs">Relatórios</span>
+                <a href="#" id="mobile-expenses" class="p-4 text-center">
+                    <i class="fas fa-file-invoice-dollar block text-xl"></i>
+                    <span class="text-xs">Despesas</span>
                 </a>
             </div>
         </div>
@@ -136,9 +161,8 @@
                     </button>
                     <h2 id="page-title" class="text-xl font-semibold text-rosa-texto">Dashboard</h2>
                 </div>
-
             </header>
-            
+                    
             <!-- Content -->
             <main class="p-4">
                 <!-- Dashboard Tab -->
@@ -156,33 +180,33 @@
                             </div>
                             <p class="text-sm text-gray-500 mt-2">Hoje</p>
                         </div>
-                        
+                                                
                         <div class="bg-white rounded-lg p-4 card-shadow">
                             <div class="flex justify-between">
                                 <div>
-                                    <p class="text-gray-500">Produtos Cadastrados</p>
-                                    <h3 class="text-2xl font-bold text-rosa-texto" id="total-products">0</h3>
+                                    <p class="text-gray-500">Total de Despesas</p>
+                                    <h3 class="text-2xl font-bold text-vermelho" id="total-expenses">R$ 0,00</h3>
                                 </div>
-                                <div class="w-12 h-12 rounded-full bg-rosa-claro flex items-center justify-center">
-                                    <i class="fas fa-box-open text-rosa-escuro"></i>
-                                </div>
-                            </div>
-                            <p class="text-sm text-gray-500 mt-2">Todos os produtos</p>
-                        </div>
-                        
-                        <div class="bg-white rounded-lg p-4 card-shadow">
-                            <div class="flex justify-between">
-                                <div>
-                                    <p class="text-gray-500">Vendas do Mês</p>
-                                    <h3 class="text-2xl font-bold text-rosa-texto" id="monthly-sales">R$ 0,00</h3>
-                                </div>
-                                <div class="w-12 h-12 rounded-full bg-rosa-claro flex items-center justify-center">
-                                    <i class="fas fa-calendar-alt text-rosa-escuro"></i>
+                                <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+                                    <i class="fas fa-money-bill-wave text-vermelho"></i>
                                 </div>
                             </div>
                             <p class="text-sm text-gray-500 mt-2">Este mês</p>
                         </div>
-                        
+                                                
+                        <div class="bg-white rounded-lg p-4 card-shadow">
+                            <div class="flex justify-between">
+                                <div>
+                                    <p class="text-gray-500">Lucro Líquido</p>
+                                    <h3 class="text-2xl font-bold" id="net-profit">R$ 0,00</h3>
+                                </div>
+                                <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
+                                    <i class="fas fa-chart-line text-verde"></i>
+                                </div>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-2">Este mês</p>
+                        </div>
+                                                
                         <div class="bg-white rounded-lg p-4 card-shadow">
                             <div class="flex justify-between">
                                 <div>
@@ -196,12 +220,23 @@
                             <p class="text-sm text-gray-500 mt-2">Em destaque</p>
                         </div>
                     </div>
-                    
+                                        
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                         <div class="bg-white rounded-lg p-4 card-shadow">
                             <div class="flex justify-between items-center mb-4">
                                 <h3 class="font-semibold text-rosa-texto">Vendas Recentes</h3>
-                                <button class="text-rosa-escuro text-sm">Ver todas</button>
+                                <!-- <button class="text-rosa-escuro text-sm">Ver todas</button> -->
+                            </div>
+                            <!-- Add sales year selector here -->
+                            <div class="flex items-center mb-2">
+                                <label for="sales-year" class="mr-2 text-sm text-gray-600">Ano:</label>
+                                <select id="sales-year" class="border rounded px-2 py-1 text-sm">
+                                    <option value="2025" selected>2025</option>
+                                    <option value="2026">2026</option>
+                                </select>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="sales-chart"></canvas>
                             </div>
                             <div class="overflow-x-auto">
                                 <table class="min-w-full">
@@ -220,11 +255,36 @@
                                 </table>
                             </div>
                         </div>
-                        
+                                                
+                        <div class="bg-white rounded-lg p-4 card-shadow">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="font-semibold text-rosa-texto">Despesas Recentes</h3>
+                                <!-- <button class="text-vermelho text-sm">Ver todas</button> -->
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full">
+                                    <thead>
+                                        <tr class="text-left text-gray-500 border-b">
+                                            <th class="pb-2">Data</th>
+                                            <th class="pb-2">Descrição</th>
+                                            <th class="pb-2">Valor</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recent-expenses">
+                                        <tr>
+                                            <td colspan="3" class="py-4 text-center text-gray-500">Nenhuma despesa registrada</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                                        
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                         <div class="bg-white rounded-lg p-4 card-shadow">
                             <div class="flex justify-between items-center mb-4">
                                 <h3 class="font-semibold text-rosa-texto">Estoque Baixo</h3>
-                                <button class="text-rosa-escuro text-sm">Ver todos</button>
+                                <!-- <button class="text-rosa-escuro text-sm">Ver todos</button> -->
                             </div>
                             <div class="overflow-x-auto">
                                 <table class="min-w-full">
@@ -243,22 +303,46 @@
                                 </table>
                             </div>
                         </div>
+                                                
+                        <div class="bg-white rounded-lg p-4 card-shadow">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="font-semibold text-rosa-texto">Despesas por Categoria</h3>
+                                <select id="expense-month" class="border rounded px-2 py-1 text-sm">
+                                    <option value="all">Todos os meses</option>
+                                    <option value="1">Janeiro</option>
+                                    <option value="2">Fevereiro</option>
+                                    <option value="3">Março</option>
+                                    <option value="4">Abril</option>
+                                    <option value="5">Maio</option>
+                                    <option value="6">Junho</option>
+                                    <option value="7">Julho</option>
+                                    <option value="8">Agosto</option>
+                                    <option value="9">Setembro</option>
+                                    <option value="10">Outubro</option>
+                                    <option value="11">Novembro</option>
+                                    <option value="12">Dezembro</option>
+                                </select>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="expenses-chart"></canvas>
+                            </div>
+                        </div>
                     </div>
-                    
+                                        
                     <div class="bg-white rounded-lg p-4 card-shadow mb-6">
                         <div class="flex justify-between items-center mb-4">
-                            <h3 class="font-semibold text-rosa-texto">Vendas Mensais</h3>
-                            <select id="sales-year" class="border rounded px-2 py-1 text-sm">
+                            <h3 class="font-semibold text-rosa-texto">Balanço Mensal</h3>
+                            <select id="balance-year" class="border rounded px-2 py-1 text-sm">
                                 <option value="2025" selected>2025</option>
-                                <option value="2026" >2026</option>
+                                <option value="2026">2026</option>
                             </select>
                         </div>
                         <div class="chart-container">
-                            <canvas id="sales-chart"></canvas>
+                            <canvas id="balance-chart"></canvas>
                         </div>
                     </div>
                 </div>
-                
+                                
                 <!-- Products Tab -->
                 <div id="products-content" class="tab-content hidden">
                     <div class="flex justify-between items-center mb-6">
@@ -267,7 +351,7 @@
                             <i class="fas fa-plus mr-2"></i> Adicionar Produto
                         </button>
                     </div>
-                    
+                                        
                     <div class="bg-white rounded-lg p-4 card-shadow mb-6">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="font-semibold text-rosa-texto">Lista de Produtos</h3>
@@ -296,7 +380,7 @@
                         </div>
                     </div>
                 </div>
-                
+                                
                 <!-- Add/Edit Product Modal -->
                 <div id="product-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-20 hidden">
                     <div class="bg-white rounded-lg w-full max-w-md mx-4">
@@ -324,12 +408,10 @@
                                 <div class="mb-4">
                                     <label for="product-category" class="block text-gray-700 mb-2">Categoria</label>
                                     <select id="product-category" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-rosa-medio">
-                                   
                                         <option value="Bolo">Bolo</option>
                                         <option value="Outros">Outros</option>
                                     </select>
                                 </div>
-
                             </form>
                         </div>
                         <div class="p-4 border-t flex justify-end">
@@ -338,7 +420,7 @@
                         </div>
                     </div>
                 </div>
-                
+                                
                 <!-- Sales Tab -->
                 <div id="sales-content" class="tab-content hidden">
                     <div class="flex justify-between items-center mb-6">
@@ -347,7 +429,7 @@
                             <i class="fas fa-plus mr-2"></i> Nova Venda
                         </button>
                     </div>
-                    
+                                        
                     <div class="bg-white rounded-lg p-4 card-shadow mb-6">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="font-semibold text-rosa-texto">Histórico de Vendas</h3>
@@ -377,7 +459,92 @@
                         </div>
                     </div>
                 </div>
-                
+                                
+                <!-- Expenses Tab -->
+                <div id="expenses-content" class="tab-content hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-semibold text-rosa-texto">Registro de Despesas</h2>
+                        <button id="new-expense-btn" class="btn-expense px-4 py-2 rounded-lg flex items-center">
+                            <i class="fas fa-plus mr-2"></i> Nova Despesa
+                        </button>
+                    </div>
+                                        
+                    <div class="bg-white rounded-lg p-4 card-shadow mb-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-semibold text-rosa-texto">Histórico de Despesas</h3>
+                            <div class="flex">
+                                <input type="date" id="expenses-date-filter" class="border rounded px-3 py-1 mr-2 text-sm">
+                                <button id="filter-expenses" class="btn-primary px-3 py-1 rounded text-sm">Filtrar</button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full">
+                                <thead>
+                                    <tr class="text-left text-gray-500 border-b">
+                                        <th class="pb-2">Data</th>
+                                        <th class="pb-2">Descrição</th>
+                                        <th class="pb-2">Categoria</th>
+                                        <th class="pb-2">Valor</th>
+                                        <th class="pb-2">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="expenses-list">
+                                    <tr>
+                                        <td colspan="5" class="py-4 text-center text-gray-500">Nenhuma despesa registrada</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                                
+                <!-- New Expense Modal -->
+                <div id="expense-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-20 hidden">
+                    <div class="bg-white rounded-lg w-full max-w-md mx-4">
+                        <div class="p-4 border-b flex justify-between items-center">
+                            <h3 class="text-lg font-semibold text-rosa-texto">Registrar Nova Despesa</h3>
+                            <button id="close-expense-modal" class="text-gray-500 hover:text-gray-700">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="p-4">
+                            <form id="expense-form">
+                                <input type="hidden" id="expense-id">
+                                <div class="mb-4">
+                                    <label for="expense-date" class="block text-gray-700 mb-2">Data</label>
+                                    <input type="date" id="expense-date" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-rosa-medio" required>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="expense-description" class="block text-gray-700 mb-2">Descrição</label>
+                                    <input type="text" id="expense-description" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-rosa-medio" required>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="expense-category" class="block text-gray-700 mb-2">Categoria</label>
+                                    <select id="expense-category" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-rosa-medio" required>
+                                        <option value="">Selecione uma categoria</option>
+                                        <option value="Ingredientes">Ingredientes</option>
+                                        <option value="Embalagens">Embalagens</option>
+                                        <option value="Equipamentos">Equipamentos</option>
+                                        <option value="Transporte">Transporte</option>
+                                        <option value="Energia">Energia</option>
+                                        <option value="Água">Água</option>
+                                        <option value="Aluguel">Aluguel</option>
+                                        <option value="Outros">Outros</option>
+                                    </select>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="expense-amount" class="block text-gray-700 mb-2">Valor (R$)</label>
+                                    <input type="number" id="expense-amount" step="0.01" min="0" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-rosa-medio" required>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="p-4 border-t flex justify-end">
+                            <button type="button" id="cancel-expense" class="px-4 py-2 border rounded mr-2 text-gray-700 hover:bg-gray-100">Cancelar</button>
+                            <button type="button" id="save-expense" class="btn-expense px-4 py-2 rounded">Registrar</button>
+                        </div>
+                    </div>
+                </div>
+                                
                 <!-- New Sale Modal -->
                 <div id="sale-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-20 hidden">
                     <div class="bg-white rounded-lg w-full max-w-md mx-4">
@@ -418,7 +585,7 @@
                         </div>
                     </div>
                 </div>
-                
+                                
                 <!-- Reports Tab -->
                 <div id="reports-content" class="tab-content hidden">
                     <div class="flex justify-between items-center mb-6">
@@ -428,23 +595,21 @@
                                 <option value="monthly">Vendas Mensais</option>
                                 <option value="products">Produtos Mais Vendidos</option>
                                 <option value="categories">Vendas por Categoria</option>
+                                <option value="expenses">Despesas por Categoria</option>
                             </select>
                             <button id="generate-report" class="btn-primary px-3 py-1 rounded text-sm">Gerar Relatório</button>
                         </div>
                     </div>
-                    
+                                        
                     <div class="bg-white rounded-lg p-4 card-shadow mb-6">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="font-semibold text-rosa-texto" id="report-title">Relatório de Vendas Mensais</h3>
-                            <!-- <button id="export-report" class="text-rosa-escuro text-sm flex items-center">
-                                <i class="fas fa-file-export mr-1"></i> Exportar
-                            </button> -->
                         </div>
                         <div class="chart-container">
                             <canvas id="report-chart"></canvas>
                         </div>
                     </div>
-                    
+                                        
                     <div class="bg-white rounded-lg p-4 card-shadow">
                         <h3 class="font-semibold text-rosa-texto mb-4">Dados do Relatório</h3>
                         <div class="overflow-x-auto">
@@ -464,7 +629,7 @@
                         </div>
                     </div>
                 </div>
-                
+                                
                 <!-- Loading Overlay -->
                 <div id="loading-overlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-30 hidden">
                     <div class="bg-white rounded-lg p-6 flex flex-col items-center">
@@ -485,15 +650,23 @@
         // Global variables
         let products = [];
         let sales = [];
+        let expenses = [];
         let currentTab = 'dashboard';
         let editProductId = null;
         let editSaleId = null;
+        let editExpenseId = null;
+        
+        let salesChart = null;
+        let reportChart = null;
+        let expensesChart = null;
+        let balanceChart = null;
         
         // DOM Elements
         const tabContents = {
             'dashboard': document.getElementById('dashboard-content'),
             'products': document.getElementById('products-content'),
             'sales': document.getElementById('sales-content'),
+            'expenses': document.getElementById('expenses-content'),
             'reports': document.getElementById('reports-content')
         };
         
@@ -501,28 +674,27 @@
             'dashboard': [document.getElementById('dashboard-tab'), document.getElementById('mobile-dashboard')],
             'products': [document.getElementById('products-tab'), document.getElementById('mobile-products')],
             'sales': [document.getElementById('sales-tab'), document.getElementById('mobile-sales')],
-            'reports': [document.getElementById('reports-tab'), document.getElementById('mobile-reports')]
+            'expenses': [document.getElementById('expenses-tab'), document.getElementById('mobile-expenses')],
+            'reports': [document.getElementById('reports-tab')]
         };
         
         const pageTitle = document.getElementById('page-title');
         const loadingOverlay = document.getElementById('loading-overlay');
-        
-        // Charts
-        let salesChart = null;
-        let reportChart = null;
         
         // Initialize the application
         document.addEventListener('DOMContentLoaded', async () => {
             // Load data from API
             await loadData();
             
-            // Initialize charts first
-            initSalesChart();
+            // Initialize charts
+            initExpensesChart();
+            initBalanceChart();
+            initSalesChart(); // <-- Add this line to initialize the sales chart
             
             // Setup event listeners
             setupEventListeners();
             
-            // Initialize dashboard after charts
+            // Initialize dashboard
             updateDashboard();
             
             // Initialize products list
@@ -531,8 +703,8 @@
             // Initialize sales list
             renderSalesList();
             
-            // Initialize charts
-            initSalesChart();
+            // Initialize expenses list
+            renderExpensesList();
         });
         
         // Load data from API
@@ -540,7 +712,7 @@
             showLoading();
             
             try {
-                const response = await fetch(API_URL + '/latest', {
+                const response = await fetch(API_URL , {
                     headers: {
                         'X-Master-Key': API_KEY,
                         'Content-Type': 'application/json'
@@ -552,6 +724,7 @@
                 if (data.record) {
                     products = data.record.products || [];
                     sales = data.record.sales || [];
+                    expenses = data.record.expenses || [];
                 }
             } catch (error) {
                 console.error('Error loading data:', error);
@@ -574,7 +747,8 @@
                     },
                     body: JSON.stringify({
                         products: products,
-                        sales: sales
+                        sales: sales,
+                        expenses: expenses
                     })
                 });
                 
@@ -594,10 +768,12 @@
             // Tab navigation
             for (const [tabName, buttons] of Object.entries(tabButtons)) {
                 buttons.forEach(button => {
-                    button.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        switchTab(tabName);
-                    });
+                    if (button) {
+                        button.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            switchTab(tabName);
+                        });
+                    }
                 });
             }
             
@@ -640,6 +816,23 @@
                 saveSale();
             });
             
+            // Expense modal
+            document.getElementById('new-expense-btn').addEventListener('click', () => {
+                openExpenseModal();
+            });
+            
+            document.getElementById('close-expense-modal').addEventListener('click', () => {
+                closeExpenseModal();
+            });
+            
+            document.getElementById('cancel-expense').addEventListener('click', () => {
+                closeExpenseModal();
+            });
+            
+            document.getElementById('save-expense').addEventListener('click', () => {
+                saveExpense();
+            });
+            
             // Product search
             document.getElementById('product-search').addEventListener('input', (e) => {
                 renderProductsList(e.target.value);
@@ -651,9 +844,30 @@
                 renderSalesList(dateFilter);
             });
             
+            // Expenses filter
+            document.getElementById('filter-expenses').addEventListener('click', () => {
+                const dateFilter = document.getElementById('expenses-date-filter').value;
+                renderExpensesList(dateFilter);
+            });
+            
             // Report generation
             document.getElementById('generate-report').addEventListener('click', () => {
                 generateReport();
+            });
+            
+            // Expense month filter
+            document.getElementById('expense-month').addEventListener('change', () => {
+                updateExpensesChart();
+            });
+            
+            // Balance year filter
+            document.getElementById('balance-year').addEventListener('change', () => {
+                updateBalanceChart();
+            });
+            
+            // Sales year filter
+            document.getElementById('sales-year').addEventListener('change', () => {
+                updateSalesChart();
             });
             
             // Calculate sale total
@@ -685,10 +899,12 @@
             // Update active tab button
             for (const [name, buttons] of Object.entries(tabButtons)) {
                 buttons.forEach(button => {
-                    if (name === tabName) {
-                        button.classList.add('bg-rosa-escuro');
-                    } else {
-                        button.classList.remove('bg-rosa-escuro');
+                    if (button) {
+                        if (name === tabName) {
+                            button.classList.add('bg-rosa-escuro');
+                        } else {
+                            button.classList.remove('bg-rosa-escuro');
+                        }
                     }
                 });
             }
@@ -705,6 +921,8 @@
                 if (!reportChart) {
                     initReportChart();
                 }
+            } else if (tabName === 'expenses') {
+                renderExpensesList();
             }
         }
         
@@ -714,6 +932,7 @@
                 'dashboard': 'Dashboard',
                 'products': 'Produtos',
                 'sales': 'Vendas',
+                'expenses': 'Despesas',
                 'reports': 'Relatórios'
             };
             
@@ -732,11 +951,15 @@
         
         // Update dashboard with current data
         function updateDashboard() {
-            // Calculate total sales
-            const totalSales = sales.reduce((sum, sale) => sum + (sale.price * sale.quantity), 0);
-            document.getElementById('total-sales').textContent = formatCurrency(totalSales);
+            // Calculate total sales for today
+            const today = new Date().toISOString().split('T')[0];
+            const todaySales = sales
+                .filter(sale => sale.date === today)
+                .reduce((sum, sale) => sum + (sale.price * sale.quantity), 0);
             
-            // Calculate monthly sales (current month)
+            document.getElementById('total-sales').textContent = formatCurrency(todaySales);
+            
+            // Calculate current month sales
             const now = new Date();
             const currentMonth = now.getMonth() + 1;
             const currentYear = now.getFullYear();
@@ -747,11 +970,33 @@
                     return saleDate.getMonth() + 1 === currentMonth && saleDate.getFullYear() === currentYear;
                 })
                 .reduce((sum, sale) => sum + (sale.price * sale.quantity), 0);
-                
-            document.getElementById('monthly-sales').textContent = formatCurrency(monthlySales);
+            
+            // Calculate current month expenses
+            const monthlyExpenses = expenses
+                .filter(expense => {
+                    const expenseDate = new Date(expense.date);
+                    return expenseDate.getMonth() + 1 === currentMonth && expenseDate.getFullYear() === currentYear;
+                })
+                .reduce((sum, expense) => sum + parseFloat(expense.amount), 0);
+            
+            document.getElementById('total-expenses').textContent = formatCurrency(monthlyExpenses);
+            
+            // Calculate net profit
+            const netProfit = monthlySales - monthlyExpenses;
+            const netProfitElement = document.getElementById('net-profit');
+            netProfitElement.textContent = formatCurrency(netProfit);
+            
+            // Set color based on profit or loss
+            if (netProfit >= 0) {
+                netProfitElement.classList.remove('loss');
+                netProfitElement.classList.add('profit');
+            } else {
+                netProfitElement.classList.remove('profit');
+                netProfitElement.classList.add('loss');
+            }
             
             // Update total products
-            document.getElementById('total-products').textContent = products.length;
+            //document.getElementById('total-products').textContent = products.length;
             
             // Find top product
             if (sales.length > 0) {
@@ -783,11 +1028,20 @@
             // Update recent sales
             updateRecentSales();
             
+            // Update recent expenses
+            updateRecentExpenses();
+            
             // Update low stock products
             updateLowStock();
             
             // Update sales chart
             updateSalesChart();
+            
+            // Update expenses chart
+            updateExpensesChart();
+            
+            // Update balance chart
+            updateBalanceChart();
         }
         
         // Update recent sales list
@@ -823,6 +1077,39 @@
                 `;
                 
                 recentSalesList.appendChild(row);
+            });
+        }
+        
+        // Update recent expenses list
+        function updateRecentExpenses() {
+            const recentExpensesList = document.getElementById('recent-expenses');
+            recentExpensesList.innerHTML = '';
+            
+            if (expenses.length === 0) {
+                recentExpensesList.innerHTML = `
+                    <tr>
+                        <td colspan="3" class="py-4 text-center text-gray-500">Nenhuma despesa registrada</td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // Sort by date (newest first)
+            const sortedExpenses = [...expenses].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            // Show only last 5 expenses
+            const recentExpenses = sortedExpenses.slice(0, 5);
+            
+            recentExpenses.forEach(expense => {
+                const row = document.createElement('tr');
+                row.className = 'border-b';
+                row.innerHTML = `
+                    <td class="py-3">${formatDate(expense.date)}</td>
+                    <td class="py-3">${expense.description}</td>
+                    <td class="py-3 text-vermelho">${formatCurrency(expense.amount)}</td>
+                `;
+                
+                recentExpensesList.appendChild(row);
             });
         }
         
@@ -903,6 +1190,112 @@
             updateSalesChart();
         }
         
+        // Initialize expenses chart
+        function initExpensesChart() {
+            const ctx = document.getElementById('expenses-chart').getContext('2d');
+            
+            expensesChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        backgroundColor: [
+                            '#DB7093',
+                            '#EF4444',
+                            '#F59E0B',
+                            '#10B981',
+                            '#3B82F6',
+                            '#6366F1',
+                            '#8B5CF6',
+                            '#EC4899'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ' + formatCurrency(context.raw);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            updateExpensesChart();
+        }
+        
+        // Initialize balance chart
+        function initBalanceChart() {
+            const ctx = document.getElementById('balance-chart').getContext('2d');
+            
+            balanceChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: 'Vendas',
+                            data: [],
+                            backgroundColor: '#DB7093',
+                            borderColor: '#C71585',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Despesas',
+                            data: [],
+                            backgroundColor: '#EF4444',
+                            borderColor: '#DC2626',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Lucro',
+                            data: [],
+                            backgroundColor: '#10B981',
+                            borderColor: '#059669',
+                            borderWidth: 1,
+                            type: 'line',
+                            tension: 0.1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return 'R$ ' + value.toLocaleString('pt-BR');
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + formatCurrency(context.raw);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            updateBalanceChart();
+        }
+        
         // Update sales chart with current data
         function updateSalesChart() {
             const year = parseInt(document.getElementById('sales-year').value);
@@ -923,38 +1316,70 @@
             salesChart.update();
         }
         
-// Initialize sales chart
-function initSalesChart() {
-    // Destroy existing chart if any
-    if (salesChart) {
-        salesChart.destroy();
-    }
-    const ctx = document.getElementById('sales-chart').getContext('2d');
-    salesChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: [],
-            datasets: [{
-                label: 'Vendas Mensais',
-                data: [],
-                backgroundColor: 'rgba(0, 123, 255, 0.6)'
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return 'R$ ' + context.raw.toLocaleString('pt-BR');
-                        }
+        // Update expenses chart with current data
+        function updateExpensesChart() {
+            const monthFilter = document.getElementById('expense-month').value;
+            
+            const categoryTotals = {};
+            
+            expenses.forEach(expense => {
+                const expenseDate = new Date(expense.date);
+                
+                if (monthFilter === 'all' || (expenseDate.getMonth() + 1).toString() === monthFilter) {
+                    if (!categoryTotals[expense.category]) {
+                        categoryTotals[expense.category] = 0;
                     }
+                    categoryTotals[expense.category] += parseFloat(expense.amount);
                 }
-            }
+            });
+            
+            const labels = Object.keys(categoryTotals);
+            const data = Object.values(categoryTotals);
+            
+            expensesChart.data.labels = labels;
+            expensesChart.data.datasets[0].data = data;
+            expensesChart.update();
         }
-    });
-}
+        
+        // Update balance chart with current data
+        function updateBalanceChart() {
+            const year = parseInt(document.getElementById('balance-year').value);
+            const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+            
+            const monthlySales = Array(12).fill(0);
+            const monthlyExpenses = Array(12).fill(0);
+            const monthlyProfits = Array(12).fill(0);
+            
+            // Calculate sales per month
+            sales.forEach(sale => {
+                const saleDate = new Date(sale.date);
+                if (saleDate.getFullYear() === year) {
+                    const month = saleDate.getMonth();
+                    monthlySales[month] += sale.price * sale.quantity;
+                }
+            });
+            
+            // Calculate expenses per month
+            expenses.forEach(expense => {
+                const expenseDate = new Date(expense.date);
+                if (expenseDate.getFullYear() === year) {
+                    const month = expenseDate.getMonth();
+                    monthlyExpenses[month] += parseFloat(expense.amount);
+                }
+            });
+            
+            // Calculate profits
+            for (let i = 0; i < 12; i++) {
+                monthlyProfits[i] = monthlySales[i] - monthlyExpenses[i];
+            }
+            
+            balanceChart.data.labels = months;
+            balanceChart.data.datasets[0].data = monthlySales;
+            balanceChart.data.datasets[1].data = monthlyExpenses;
+            balanceChart.data.datasets[2].data = monthlyProfits;
+            balanceChart.update();
+        }
+        
         // Initialize report chart
         function initReportChart() {
             const ctx = document.getElementById('report-chart').getContext('2d');
@@ -1093,6 +1518,35 @@ function initSalesChart() {
                         }
                     }
                 };
+            } else if (reportType === 'expenses') {
+                // Expenses by category report
+                const categoryExpenses = {};
+                
+                expenses.forEach(expense => {
+                    if (!categoryExpenses[expense.category]) {
+                        categoryExpenses[expense.category] = 0;
+                    }
+                    categoryExpenses[expense.category] += parseFloat(expense.amount);
+                });
+                
+                labels = Object.keys(categoryExpenses);
+                data = Object.values(categoryExpenses);
+                reportTitle = 'Despesas por Categoria';
+                col1 = 'Categoria';
+                col2 = 'Total de Despesas';
+                
+                reportChart.data.datasets[0].label = 'Despesas (R$)';
+                
+                // Update tooltip to show currency
+                reportChart.options.plugins = {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return 'R$ ' + context.raw.toLocaleString('pt-BR');
+                            }
+                        }
+                    }
+                };
             }
             
             // Update report chart
@@ -1116,7 +1570,7 @@ function initSalesChart() {
                 const row = document.createElement('tr');
                 row.className = 'border-b';
                 
-                if (reportType === 'monthly' || reportType === 'categories') {
+                if (reportType === 'monthly' || reportType === 'categories' || reportType === 'expenses') {
                     row.innerHTML = `
                         <td class="py-3">${labels[i]}</td>
                         <td class="py-3">${formatCurrency(data[i])}</td>
@@ -1143,8 +1597,7 @@ function initSalesChart() {
                 const term = searchTerm.toLowerCase();
                 filteredProducts = products.filter(product => 
                     product.name.toLowerCase().includes(term) ||
-                    (product.category && product.category.toLowerCase().includes(term)) ||
-                    (product.description && product.description.toLowerCase().includes(term))
+                    (product.category && product.category.toLowerCase().includes(term))
                 );
             }
             
@@ -1225,6 +1678,51 @@ function initSalesChart() {
             });
         }
         
+        // Render expenses list
+        function renderExpensesList(dateFilter = '') {
+            const expensesList = document.getElementById('expenses-list');
+            expensesList.innerHTML = '';
+            
+            let filteredExpenses = [...expenses];
+            
+            if (dateFilter) {
+                filteredExpenses = expenses.filter(expense => expense.date === dateFilter);
+            }
+            
+            if (filteredExpenses.length === 0) {
+                expensesList.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="py-4 text-center text-gray-500">${dateFilter ? 'Nenhuma despesa nesta data' : 'Nenhuma despesa registrada'}</td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // Sort by date (newest first)
+            filteredExpenses.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            filteredExpenses.forEach(expense => {
+                const row = document.createElement('tr');
+                row.className = 'border-b';
+                row.innerHTML = `
+                    <td class="py-3">${formatDate(expense.date)}</td>
+                    <td class="py-3">${expense.description}</td>
+                    <td class="py-3">${expense.category}</td>
+                    <td class="py-3 text-vermelho">${formatCurrency(expense.amount)}</td>
+                    <td class="py-3">
+                        <button class="text-rosa-escuro hover:text-rosa-texto mr-2" onclick="editExpense('${expense.id}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="text-red-500 hover:text-red-700" onclick="deleteExpense('${expense.id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                
+                expensesList.appendChild(row);
+            });
+        }
+        
         // Open product modal for adding new product
         function openProductModal(product = null) {
             const modal = document.getElementById('product-modal');
@@ -1238,7 +1736,6 @@ function initSalesChart() {
                 document.getElementById('product-price').value = product.price;
                 document.getElementById('product-stock').value = product.stock;
                 document.getElementById('product-category').value = product.category || 'Outros';
-                // document.getElementById('product-description').value = product.description || '';
                 
                 editProductId = product.id;
             } else {
@@ -1258,6 +1755,41 @@ function initSalesChart() {
             editProductId = null;
         }
         
+        // Open expense modal for adding new expense
+        function openExpenseModal(expense = null) {
+            const modal = document.getElementById('expense-modal');
+            const form = document.getElementById('expense-form');
+            
+            // Set today's date as default
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('expense-date').value = today;
+            
+            if (expense) {
+                // Edit mode
+                document.getElementById('expense-id').value = expense.id;
+                document.getElementById('expense-date').value = expense.date;
+                document.getElementById('expense-description').value = expense.description;
+                document.getElementById('expense-category').value = expense.category;
+                document.getElementById('expense-amount').value = expense.amount;
+                
+                editExpenseId = expense.id;
+            } else {
+                // Add mode
+                form.reset();
+                document.getElementById('expense-date').value = today;
+                editExpenseId = null;
+            }
+            
+            modal.classList.remove('hidden');
+        }
+        
+        // Close expense modal
+        function closeExpenseModal() {
+            document.getElementById('expense-modal').classList.add('hidden');
+            document.getElementById('expense-form').reset();
+            editExpenseId = null;
+        }
+        
         // Save product (add or edit)
         async function saveProduct() {
             const form = document.getElementById('product-form');
@@ -1265,7 +1797,6 @@ function initSalesChart() {
             const price = parseFloat(document.getElementById('product-price').value);
             const stock = parseInt(document.getElementById('product-stock').value);
             const category = document.getElementById('product-category').value;
-            // Removed product-description field as per requirements
             
             if (!name || isNaN(price) || isNaN(stock)) {
                 alert('Por favor, preencha todos os campos obrigatórios.');
@@ -1284,8 +1815,7 @@ function initSalesChart() {
                             name,
                             price,
                             stock,
-                            category,
-                            // Removed product-description field as per requirements
+                            category
                         };
                     }
                 } else {
@@ -1295,8 +1825,7 @@ function initSalesChart() {
                         name,
                         price,
                         stock,
-                        category,
-                        // Removed product-description field as per requirements
+                        category
                     };
                     
                     products.push(newProduct);
@@ -1313,16 +1842,62 @@ function initSalesChart() {
                 console.error('Error saving product:', error);
                 alert('Erro ao salvar produto. Por favor, tente novamente.');
             } finally {
-                // Ensure channel closure after saving
-                // Ensure channel closure after saving
-                if (channel && !channel.closed) {
-                    channel.close();
+                hideLoading();
+            }
+        }
+        
+        // Save expense (add or edit)
+        async function saveExpense() {
+            const form = document.getElementById('expense-form');
+            const date = document.getElementById('expense-date').value;
+            const description = document.getElementById('expense-description').value.trim();
+            const category = document.getElementById('expense-category').value;
+            const amount = parseFloat(document.getElementById('expense-amount').value);
+            
+            if (!date || !description || !category || isNaN(amount) || amount <= 0) {
+                alert('Por favor, preencha todos os campos corretamente.');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                if (editExpenseId) {
+                    // Edit existing expense
+                    const index = expenses.findIndex(e => e.id === editExpenseId);
+                    if (index !== -1) {
+                        expenses[index] = {
+                            ...expenses[index],
+                            date,
+                            description,
+                            category,
+                            amount
+                        };
+                    }
+                } else {
+                    // Add new expense
+                    const newExpense = {
+                        id: generateId(),
+                        date,
+                        description,
+                        category,
+                        amount
+                    };
+                    
+                    expenses.push(newExpense);
                 }
-                // Add safety check for undefined channel
-                if (typeof channel === 'undefined') {
-                    console.warn('Channel not initialized');
-                    return;
-                }
+                
+                // Save to API
+                await saveData();
+                
+                // Update UI
+                renderExpensesList();
+                updateDashboard();
+                closeExpenseModal();
+            } catch (error) {
+                console.error('Error saving expense:', error);
+                alert('Erro ao registrar despesa. Por favor, tente novamente.');
+            } finally {
                 hideLoading();
             }
         }
@@ -1357,6 +1932,7 @@ function initSalesChart() {
             } else {
                 // Add mode
                 form.reset();
+                document.getElementById('sale-date').value = today;
                 editSaleId = null;
             }
             
@@ -1461,6 +2037,14 @@ function initSalesChart() {
             }
         }
         
+        // Edit expense
+        function editExpense(expenseId) {
+            const expense = expenses.find(e => e.id === expenseId);
+            if (expense) {
+                openExpenseModal(expense);
+            }
+        }
+        
         // Delete product
         async function deleteProduct(productId) {
             if (!confirm('Tem certeza que deseja excluir este produto?')) {
@@ -1525,6 +2109,28 @@ function initSalesChart() {
             }
         }
         
+        // Delete expense
+        async function deleteExpense(expenseId) {
+            if (!confirm('Tem certeza que deseja excluir esta despesa?')) {
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                expenses = expenses.filter(e => e.id !== expenseId);
+                await saveData();
+                
+                renderExpensesList();
+                updateDashboard();
+            } catch (error) {
+                console.error('Error deleting expense:', error);
+                alert('Erro ao excluir despesa. Por favor, tente novamente.');
+            } finally {
+                hideLoading();
+            }
+        }
+        
         // Helper functions
         function generateId() {
             return Date.now().toString(36) + Math.random().toString(36).substr(2);
@@ -1543,6 +2149,8 @@ function initSalesChart() {
         window.editProduct = editProduct;
         window.deleteProduct = deleteProduct;
         window.deleteSale = deleteSale;
+        window.editExpense = editExpense;
+        window.deleteExpense = deleteExpense;
     </script>
 </body>
 </html>
